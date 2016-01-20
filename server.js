@@ -8,7 +8,7 @@ var todoNestID = 1;
 app.use(bodyParser.json());
 var todos = [];
 
-
+// GET data 
 app.get('/', function (req,res){
  
    res.send('Todo api root');
@@ -32,7 +32,7 @@ app.get('/todos/:id', function(req, res){
     }
 
 });
-
+// POST data 
 app.post('/todos', function(req, res){
 
   var body = _.pick(req.body, 'description', 'completed');
@@ -40,7 +40,7 @@ app.post('/todos', function(req, res){
   	return res.status(404).send();
   };
   body.description = body.description.trim();
-  
+
   body.id = todoNestID++;
   todos.push(body);
 
@@ -48,6 +48,26 @@ app.post('/todos', function(req, res){
   res.json(body);
 });
 
+// Delet data
+
+app.delete('/todos/:id',function (req, res){
+  var todoId = parseInt(req.params.id, 10);
+  var match = _.findWhere(todos, {id: todoId});
+  
+   if (!match) {
+   	res.status(404).json({"error": "Id not found" });
+   }else {
+   	todos = _.without(todos,match);
+   	res.json(match);
+   }
+
+});
+
+
 app.listen(PORT, function(){
 	console.log('Express listening on port ' + PORT + '!');
 } );
+
+
+
+
