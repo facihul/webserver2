@@ -1,26 +1,14 @@
 
 var bodyParser = require('body-parser');
 var express = require('express');
+var _ = require('underscore');
 var app = express();
 var PORT = process.env.PORT || 3000;
 var todoNestID = 1;
 app.use(bodyParser.json());
 var todos = [];
-// {
-// 	id: 1,
-// 	description : 'Meet me for launch',
-// 	completed: false 
-// }, {
-//   id: 2,  
-//   description : 'Meet me for dinner',
-//   completed: false 
 
-// },
-// {
-//   id: 3,  
-//   description : 'feed farhan',
-//   completed: false 
-// }];
+
 app.get('/', function (req,res){
  
    res.send('Todo api root');
@@ -33,13 +21,9 @@ app.get('/todos', function(req, res){
 });
 
 app.get('/todos/:id', function(req, res){
-	var match;
     var todoId = parseInt(req.params.id,10);
-    todos.forEach(function(todo){
-     if (todoId === todo.id) {
-      match = todo;
-     };
-    });
+    var match = _.findWhere(todos,{id: todoId});
+    
 
     if (match) {
     	res.json(match);
@@ -51,7 +35,12 @@ app.get('/todos/:id', function(req, res){
 
 app.post('/todos', function(req, res){
 
-  var body = req.body;
+  var body = _.pick(req.body, 'description', 'completed');
+  if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
+  	return res.status(404).send();
+  };
+  body.description = body.description.trim();
+  
   body.id = todoNestID++;
   todos.push(body);
 
