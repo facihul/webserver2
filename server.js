@@ -29,15 +29,15 @@ app.get('/todos', function(req, res) {
       $like: '%' + queryParams.q + '%'
     };
   }
-    db.todo.findAll({
-      where: where
-    }).then(function(todos) {
-      res.json(todos);
-    }, function(e) {
-      res.status(500).send();
-    });
+  db.todo.findAll({
+    where: where
+  }).then(function(todos) {
+    res.json(todos);
+  }, function(e) {
+    res.status(500).send();
+  });
 
-  
+
   // old version without sqlite database
   /*
      var filteredTodos = todos;
@@ -118,6 +118,24 @@ app.post('/todos', function(req, res) {
 
 app.delete('/todos/:id', function(req, res) {
   var todoId = parseInt(req.params.id, 10);
+db.todo.destroy({
+  where: {
+    id: todoId
+  }
+}).then(function (rowsDeleted){
+  if (rowsDeleted === 0) {
+    res.status(404).json({
+      error : 'No todo with id'
+    });
+  }else {
+    res.status(204).send();
+  }
+},function(){
+ res.status(500).send();
+});
+
+ // old version without sqlite database
+  /*
   var match = _.findWhere(todos, {
     id: todoId
   });
@@ -130,6 +148,7 @@ app.delete('/todos/:id', function(req, res) {
     todos = _.without(todos, match);
     res.json(match);
   }
+  */
 
 });
 
@@ -137,7 +156,10 @@ app.delete('/todos/:id', function(req, res) {
 
 app.put('/todos/:id', function(req, res) {
 
+ 
   var todoId = parseInt(req.params.id, 10);
+ // old version without sqlite database
+/*
   var match = _.findWhere(todos, {
     id: todoId
   });
@@ -162,7 +184,7 @@ app.put('/todos/:id', function(req, res) {
 
   _.extend(match, validatt);
   res.json(match);
-
+*/
 
 });
 
