@@ -118,23 +118,23 @@ app.post('/todos', function(req, res) {
 
 app.delete('/todos/:id', function(req, res) {
   var todoId = parseInt(req.params.id, 10);
-db.todo.destroy({
-  where: {
-    id: todoId
-  }
-}).then(function (rowsDeleted){
-  if (rowsDeleted === 0) {
-    res.status(404).json({
-      error : 'No todo with id'
-    });
-  }else {
-    res.status(204).send();
-  }
-},function(){
- res.status(500).send();
-});
+  db.todo.destroy({
+    where: {
+      id: todoId
+    }
+  }).then(function(rowsDeleted) {
+    if (rowsDeleted === 0) {
+      res.status(404).json({
+        error: 'No todo with id'
+      });
+    } else {
+      res.status(204).send();
+    }
+  }, function() {
+    res.status(500).send();
+  });
 
- // old version without sqlite database
+  // old version without sqlite database
   /*
   var match = _.findWhere(todos, {
     id: todoId
@@ -156,9 +156,38 @@ db.todo.destroy({
 
 app.put('/todos/:id', function(req, res) {
 
- 
   var todoId = parseInt(req.params.id, 10);
- // old version without sqlite database
+  var body = _.pick(req.body, 'description', 'completed');
+  var attributes = {};
+
+  if (body.hasOwnProperty("completed")) {
+    attributes.completed = body.completed;
+  }
+
+  if (body.hasOwnProperty('description')) {
+    attributes.description = body.description;
+
+  }
+
+  db.todo.findById(todoId).then(function(todo) {
+    if (todo) {
+      return todo.update(attributes);
+    } else {
+      res.status(404).send();
+    }
+  }, function() {
+    res.status(500).send();
+  }).then(function(todo) {
+    res.json(todo.toJSON());
+  }, function(e) {
+    res.status(e).send();
+  });
+});
+
+
+
+
+// old version without sqlite database
 /*
   var match = _.findWhere(todos, {
     id: todoId
@@ -186,7 +215,7 @@ app.put('/todos/:id', function(req, res) {
   res.json(match);
 */
 
-});
+
 
 db.sequelize.sync().then(function() {
   app.listen(PORT, function() {
