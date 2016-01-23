@@ -186,7 +186,6 @@ app.put('/todos/:id', function(req, res) {
 
 
 
-
 // old version without sqlite database
 /*
   var match = _.findWhere(todos, {
@@ -214,6 +213,17 @@ app.put('/todos/:id', function(req, res) {
   _.extend(match, validatt);
   res.json(match);
 */
+
+app.post('/user', function(req, res) {
+
+  var body = _.pick(req.body, 'email', 'password');
+  db.user.create(body).then(function (user) {
+    res.json(user.toJSON());
+
+  }, function(e) {
+    res.status(400).json(e);
+  });
+});
 
 
 
