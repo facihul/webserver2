@@ -230,7 +230,7 @@ app.post('/user', function(req, res) {
 app.post('/user/login', function(req, res) {
   var body = _.pick(req.body, 'email', 'password');
   db.user.authenticate(body).then(function (user){
-   res.json(user.toPublicJSON());
+   res.header('Auth',user.generateToken('authenticate')).json(user.toPublicJSON());
   }, function (){
    res.status(401).send();
   });
